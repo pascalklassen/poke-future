@@ -52,7 +52,7 @@ public class APIResource<ResourceT> extends TypeClassHolder<ResourceT> {
         Promise<List<R>> promise = Promise.promise();
 
         CompositeFuture
-                .any(
+                .all(
                         resourceList
                                 .stream()
                                 .map(APIResource::fetch)
