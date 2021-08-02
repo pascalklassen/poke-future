@@ -7,6 +7,9 @@
     <p>
         A reactive <a href="https://pokeapi.co/">PokéApi-Wrapper</a> written in Java using <a href="https://vertx.io/">Vert.x</a>
     </p>
+    <p>
+        Maintainers: <a href="https://github.com/pascalklassen">Pascal Klaßen</a> and <a href="https://github.com/Darkoberd00">Phil Träger</a>
+    </p>
 </div>
 
 
