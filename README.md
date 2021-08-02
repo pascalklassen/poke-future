@@ -93,8 +93,10 @@ import io.github.pascalklassen.pokefuture.utility.common.APIResource;
 class Example {
     public static void main(String[] args) {
         Pokemon
-                .fetchList() // Future<NamedAPIResourceList<Pokemon>>
-                .compose(resourceList -> APIResource.composeAll(resourceList.getResults())) // Future<List<Pokemon>>
+                .fetchList()
+                // Future<NamedAPIResourceList<Pokemon>>
+                .compose(resourceList -> APIResource.composeAll(resourceList.getResults()))
+                // Future<List<Pokemon>>
                 .onSuccess(pokemonList -> 
                         pokemonList.forEach(pokemon -> System.out.println(pokemon.getName())))
                 .onFailure(cause -> System.err.println(cause.getMessage()));
