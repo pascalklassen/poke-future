@@ -28,7 +28,6 @@ Replace `VERSION` in the examples below with the latest stable release version.
             <id>ossrh</id>
             <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
-        </repository>
     </repositories>
 
     <dependencies>
