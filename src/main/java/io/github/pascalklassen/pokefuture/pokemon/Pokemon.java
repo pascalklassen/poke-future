@@ -2,8 +2,6 @@ package io.github.pascalklassen.pokefuture.pokemon;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import io.github.pascalklassen.pokefuture.utility.internal.annotation.ResourceEntity;
 import com.google.common.base.Preconditions;
 import io.github.pascalklassen.pokefuture.PokemonService;
@@ -17,7 +15,6 @@ import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Pokémon are the creatures that inhabit the world of the Pokémon games. They can be caught using Pokéballs and trained
@@ -31,11 +28,6 @@ import java.util.concurrent.TimeUnit;
 @ResourceEntity
 @JsonIgnoreProperties("past_types")
 public final class Pokemon {
-
-    /**
-     * Cache all results of Pokémon
-     */
-    private static final Cache<String, Pokemon> cache = CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.MINUTES).build();
 
     /**
      * The identifier for this resource.
@@ -306,16 +298,7 @@ public final class Pokemon {
 
     public static Future<Pokemon> fetch(@NotNull String nameOrId) {
         Preconditions.checkNotNull(nameOrId);
-
-        if(cache.asMap().containsKey(nameOrId)){
-            return Future.succeededFuture(cache.getIfPresent(nameOrId));
-        }
-
-        return PokemonService.fetchAs(Pokemon.class, String.format("/pokemon/%s", nameOrId))
-                        .onSuccess(pokemon -> {
-                            System.out.println("wurde Cachet: " + pokemon.getName());
-                            cache.put(nameOrId, pokemon);
-                        });
+        return PokemonService.fetchAs(Pokemon.class, String.format("/pokemon/%s", nameOrId));
     }
 
     public static Future<NamedAPIResourceList<Pokemon>> fetchList() {

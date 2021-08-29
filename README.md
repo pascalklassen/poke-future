@@ -96,7 +96,7 @@ class Example {
         Pokemon
                 .fetchList()
                 // Future<NamedAPIResourceList<Pokemon>>
-                .compose(resourceList -> APIResource.composeAll(resourceList.getResults()))
+                .compose(APIResource::composeAll)
                 // Future<List<Pokemon>>
                 .onSuccess(pokemonList -> 
                         pokemonList.forEach(pokemon -> System.out.println(pokemon.getName())))
