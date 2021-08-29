@@ -74,10 +74,12 @@ import java.util.concurrent.TimeUnit;
 public final class PokemonService {
 
     private static final Map<Class<?>, Cache<String, Object>> caches;
+    private static boolean isCache = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(PokemonService.class);
 
     static {
         caches = new HashMap<>();
+
         caches.put(Ability.class, createCache());
         caches.put(Berry.class, createCache());
         caches.put(BerryFirmness.class, createCache());
@@ -144,7 +146,7 @@ public final class PokemonService {
     public static <T> Future<T> fetchAs(@NotNull Class<T> clazz, @NotNull String uri, boolean absolute) {
         Promise<T> promise = Promise.promise();
 
-        if(getValue(clazz, uri) != null){
+        if(isCache && getValue(clazz, uri) != null){
             return Future.succeededFuture(getValue(clazz, uri));
         }
 
@@ -158,7 +160,9 @@ public final class PokemonService {
                         T t = ar.result().body();
                         resolveFetchTypes(clazz, t);
                         promise.complete(t);
-                        setValue(clazz, uri, t);
+                        if(isCache) {
+                            setValue(clazz, uri, t);
+                        }
                     } else {
                         promise.fail(ar.cause());
                     }
@@ -224,6 +228,14 @@ public final class PokemonService {
                 });
 
         return promise.future();
+    }
+
+    public static void disableCashing(){
+        isCache = false;
+    }
+
+    public static void enableCashing(){
+        isCache = true;
     }
 
     @SuppressWarnings("unchecked")
