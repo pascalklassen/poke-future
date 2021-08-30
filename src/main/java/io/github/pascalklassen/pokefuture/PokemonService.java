@@ -78,7 +78,7 @@ public final class PokemonService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PokemonService.class);
 
     static {
-        invalidateAllCaches();
+        initailizeCaches();
     }
 
     private PokemonService() {
@@ -97,10 +97,12 @@ public final class PokemonService {
 
     public static <T> Future<T> fetchAs(@NotNull Class<T> clazz, @NotNull String uri, boolean absolute) {
         Promise<T> promise = Promise.promise();
-        T value = getValue(clazz, uri);
 
-        if (cachingEnabled && value != null) {
-            return Future.succeededFuture(value);
+        if (cachingEnabled) {
+            T value = getValue(clazz, uri);
+            if (value != null) {
+                return Future.succeededFuture(value);
+            }
         }
 
         HttpRequest<Buffer> request = absolute ?
@@ -191,13 +193,13 @@ public final class PokemonService {
 
     public static void enableCaching() {
         cachingEnabled = true;
-        invalidateAllCaches();
+        initailizeCaches();
     }
 
     private static void invalidateAllCaches() {
         if (caches != null) {
-            for (Class<?> clazz: caches.keySet()) {
-                invalidateCache(clazz);
+            for (Cache<String, Object> cache : caches.values()) {
+                invalidateCache(cache);
             }
         }
     }
@@ -253,14 +255,14 @@ public final class PokemonService {
         caches.put(VersionGroup.class, createCache());
     }
 
-    private static <T> void invalidateCache(@NotNull Class<?> clazz) {
-        Preconditions.checkNotNull(clazz);
-        caches.get(clazz).invalidateAll();
-        caches.get(clazz).cleanUp();
+    private static void invalidateCache(@NotNull Cache<String, Object> cache) {
+        Preconditions.checkNotNull(cache);
+        cache.invalidateAll();
+        cache.cleanUp();
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T getValue(@NotNull Class<T> clazz, @NotNull String uri){
+    private static <T> T getValue(@NotNull Class<T> clazz, @NotNull String uri) {
         Preconditions.checkNotNull(clazz);
         Preconditions.checkNotNull(uri);
         if (!caches.containsKey(clazz)) {
@@ -271,7 +273,7 @@ public final class PokemonService {
                 .getIfPresent(uri);
     }
 
-    private static <T> void setValue(@NotNull Class<T> clazz, @NotNull String key, @NotNull Object value){
+    private static <T> void setValue(@NotNull Class<T> clazz, @NotNull String key, @NotNull Object value) {
         Preconditions.checkNotNull(clazz);
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
