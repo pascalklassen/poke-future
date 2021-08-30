@@ -371,7 +371,7 @@ public final class PokemonService {
                     if (value instanceof List) {
                         LOGGER.debug(String.format("Field '%s' was a generic List", field.getName()));
 
-                        List<Object> list = (List<Object>) field.get(object);
+                        List<Object> list = (List<Object>) value;
                         list.forEach(obj -> resolveFetchTypes(obj.getClass(), obj));
                     } else {
                         LOGGER.debug(String.format("Field '%s' was a generic Object", field.getName()));
