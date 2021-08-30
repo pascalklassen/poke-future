@@ -73,70 +73,22 @@ import java.util.concurrent.TimeUnit;
 
 public final class PokemonService {
 
-    private static final Map<Class<?>, Cache<String, Object>> caches;
-    private static boolean isCache = true;
+    private static Map<Class<?>, Cache<String, Object>> caches;
+    private static boolean cachingEnabled = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(PokemonService.class);
 
     static {
-        caches = new HashMap<>();
-
-        caches.put(Ability.class, createCache());
-        caches.put(Berry.class, createCache());
-        caches.put(BerryFirmness.class, createCache());
-        caches.put(BerryFlavor.class, createCache());
-        caches.put(Characteristic.class, createCache());
-        caches.put(ContestType.class, createCache());
-        caches.put(ContestEffect.class, createCache());
-        caches.put(EggGroup.class, createCache());
-        caches.put(EncounterMethod.class, createCache());
-        caches.put(EncounterCondition.class, createCache());
-        caches.put(EncounterConditionValue.class, createCache());
-        caches.put(EvolutionChain.class, createCache());
-        caches.put(EvolutionTrigger.class, createCache());
-        caches.put(Generation.class, createCache());
-        caches.put(Gender.class, createCache());
-        caches.put(GrowthRate.class, createCache());
-
-        caches.put(Item.class, createCache());
-        caches.put(ItemCategory.class, createCache());
-        caches.put(ItemAttribute.class, createCache());
-        caches.put(ItemFlingEffect.class, createCache());
-        caches.put(ItemPocket.class, createCache());
-        caches.put(Language.class, createCache());
-        caches.put(Location.class, createCache());
-        caches.put(LocationArea.class, createCache());
-        caches.put(Move.class, createCache());
-        caches.put(MoveAilment.class, createCache());
-        caches.put(MoveBattleStyle.class, createCache());
-        caches.put(MoveCategory.class, createCache());
-        caches.put(MoveDamageClass.class, createCache());
-        caches.put(MoveLearnMethod.class, createCache());
-        caches.put(MoveTarget.class, createCache());
-        caches.put(Nature.class, createCache());
-
-        caches.put(PalParkArea.class, createCache());
-        caches.put(Pokedex.class, createCache());
-        caches.put(Pokemon.class, createCache());
-        caches.put(PokemonColor.class, createCache());
-        caches.put(PokemonForm.class, createCache());
-        caches.put(PokemonHabitat.class, createCache());
-        caches.put(PokemonShape.class, createCache());
-        caches.put(PokemonSpecies.class, createCache());
-        caches.put(PokeathlonStat.class, createCache());
-        caches.put(Region.class, createCache());
-        caches.put(Stat.class, createCache());
-        caches.put(SuperContestEffect.class, createCache());
-        caches.put(Type.class, createCache());
-        caches.put(Version.class, createCache());
-        caches.put(VersionGroup.class, createCache());
-
+        invalidateAllCaches();
     }
 
     private PokemonService() {
     }
 
-    private static Cache<String, Object> createCache(){
-        return CacheBuilder.newBuilder().expireAfterAccess(10, TimeUnit.MINUTES).build();
+    private static Cache<String, Object> createCache() {
+        return CacheBuilder
+                .newBuilder()
+                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .build();
     }
 
     public static <T> Future<T> fetchAs(@NotNull Class<T> clazz, @NotNull String uri) {
@@ -145,9 +97,10 @@ public final class PokemonService {
 
     public static <T> Future<T> fetchAs(@NotNull Class<T> clazz, @NotNull String uri, boolean absolute) {
         Promise<T> promise = Promise.promise();
+        T value = getValue(clazz, uri);
 
-        if(isCache && getValue(clazz, uri) != null){
-            return Future.succeededFuture(getValue(clazz, uri));
+        if (cachingEnabled && value != null) {
+            return Future.succeededFuture(value);
         }
 
         HttpRequest<Buffer> request = absolute ?
@@ -160,7 +113,7 @@ public final class PokemonService {
                         T t = ar.result().body();
                         resolveFetchTypes(clazz, t);
                         promise.complete(t);
-                        if(isCache) {
+                        if (cachingEnabled) {
                             setValue(clazz, uri, t);
                         }
                     } else {
@@ -230,29 +183,101 @@ public final class PokemonService {
         return promise.future();
     }
 
-    public static void disableCashing(){
-        isCache = false;
+    public static void disableCaching() {
+        cachingEnabled = false;
+        invalidateAllCaches();
+        caches = null;
     }
 
-    public static void enableCashing(){
-        isCache = true;
+    public static void enableCaching() {
+        cachingEnabled = true;
+        invalidateAllCaches();
+    }
+
+    private static void invalidateAllCaches() {
+        if (caches != null) {
+            for (Class<?> clazz: caches.keySet()) {
+                invalidateCache(clazz);
+            }
+        }
+    }
+
+    private static void initailizeCaches() {
+        caches = new HashMap<>();
+        caches.put(Ability.class, createCache());
+        caches.put(Berry.class, createCache());
+        caches.put(BerryFirmness.class, createCache());
+        caches.put(BerryFlavor.class, createCache());
+        caches.put(Characteristic.class, createCache());
+        caches.put(ContestType.class, createCache());
+        caches.put(ContestEffect.class, createCache());
+        caches.put(EggGroup.class, createCache());
+        caches.put(EncounterMethod.class, createCache());
+        caches.put(EncounterCondition.class, createCache());
+        caches.put(EncounterConditionValue.class, createCache());
+        caches.put(EvolutionChain.class, createCache());
+        caches.put(EvolutionTrigger.class, createCache());
+        caches.put(Generation.class, createCache());
+        caches.put(Gender.class, createCache());
+        caches.put(GrowthRate.class, createCache());
+        caches.put(Item.class, createCache());
+        caches.put(ItemCategory.class, createCache());
+        caches.put(ItemAttribute.class, createCache());
+        caches.put(ItemFlingEffect.class, createCache());
+        caches.put(ItemPocket.class, createCache());
+        caches.put(Language.class, createCache());
+        caches.put(Location.class, createCache());
+        caches.put(LocationArea.class, createCache());
+        caches.put(Move.class, createCache());
+        caches.put(MoveAilment.class, createCache());
+        caches.put(MoveBattleStyle.class, createCache());
+        caches.put(MoveCategory.class, createCache());
+        caches.put(MoveDamageClass.class, createCache());
+        caches.put(MoveLearnMethod.class, createCache());
+        caches.put(MoveTarget.class, createCache());
+        caches.put(Nature.class, createCache());
+        caches.put(PalParkArea.class, createCache());
+        caches.put(Pokedex.class, createCache());
+        caches.put(Pokemon.class, createCache());
+        caches.put(PokemonColor.class, createCache());
+        caches.put(PokemonForm.class, createCache());
+        caches.put(PokemonHabitat.class, createCache());
+        caches.put(PokemonShape.class, createCache());
+        caches.put(PokemonSpecies.class, createCache());
+        caches.put(PokeathlonStat.class, createCache());
+        caches.put(Region.class, createCache());
+        caches.put(Stat.class, createCache());
+        caches.put(SuperContestEffect.class, createCache());
+        caches.put(Type.class, createCache());
+        caches.put(Version.class, createCache());
+        caches.put(VersionGroup.class, createCache());
+    }
+
+    private static <T> void invalidateCache(@NotNull Class<?> clazz) {
+        Preconditions.checkNotNull(clazz);
+        caches.get(clazz).invalidateAll();
+        caches.get(clazz).cleanUp();
     }
 
     @SuppressWarnings("unchecked")
     private static <T> T getValue(@NotNull Class<T> clazz, @NotNull String uri){
         Preconditions.checkNotNull(clazz);
         Preconditions.checkNotNull(uri);
-        if(caches.containsKey(clazz)){
-            return (T) caches.get(clazz).getIfPresent(uri);
+        if (!caches.containsKey(clazz)) {
+            return null;
         }
-        return null;
+        return (T) caches
+                .get(clazz)
+                .getIfPresent(uri);
     }
 
     private static <T> void setValue(@NotNull Class<T> clazz, @NotNull String key, @NotNull Object value){
         Preconditions.checkNotNull(clazz);
         Preconditions.checkNotNull(key);
         Preconditions.checkNotNull(value);
-        caches.get(clazz).put(key, value);
+        caches
+                .get(clazz)
+                .put(key, value);
     }
 
     /**
