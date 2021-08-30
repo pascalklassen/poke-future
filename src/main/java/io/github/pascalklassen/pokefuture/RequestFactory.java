@@ -1,5 +1,6 @@
 package io.github.pascalklassen.pokefuture;
 
+import com.google.common.base.Preconditions;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.client.HttpRequest;
@@ -21,7 +22,7 @@ public final class RequestFactory {
         client = WebClient.create(
                 vertx,
                 new WebClientOptions()
-                        .setUserAgent("FungalfTheGrey/1.0.0")
+                        .setUserAgent("FungalfTheGrey/0.1.0")
                         .setDefaultHost("pokeapi.co")
                         .setDefaultPort(443)
                         .setSsl(true)
@@ -31,6 +32,8 @@ public final class RequestFactory {
     }
 
     public static HttpRequest<Buffer> newResourceRequest(@NotNull String uri) {
+        Preconditions.checkNotNull(uri);
+
         return client.get(uri)
                 .putHeader("accept", "application/json")
                 .expect(ResponsePredicate.JSON)
@@ -38,6 +41,8 @@ public final class RequestFactory {
     }
 
     public static HttpRequest<Buffer> newRequest(@NotNull String uri) {
+        Preconditions.checkNotNull(uri);
+
         return client.get(uri)
                 .putHeader("accept", "application/json")
                 .expect(ResponsePredicate.JSON)

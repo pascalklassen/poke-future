@@ -6,7 +6,7 @@
 
     <groupId>io.github.pascalklassen</groupId>
     <artifactId>poke-future</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <name>PokeFuture</name>
     <description>A Reactive PokéApi-Wrapper written in Java using Vert.x</description>
