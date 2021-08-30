@@ -68,19 +68,19 @@ public final class PokemonSpecies {
     private int baseHappiness;
 
     /**
-     * Whether or not this is a baby Pokémon.
+     * Whether this is a baby Pokémon.
      */
     @JsonProperty("is_baby")
     private boolean isBaby;
 
     /**
-     * Whether or not this is a legendary Pokémon.
+     * Whether this is a legendary Pokémon.
      */
     @JsonProperty("is_legendary")
     private boolean isLegendary;
 
     /**
-     * Whether or not this is a mythical Pokémon.
+     * Whether this is a mythical Pokémon.
      */
     @JsonProperty("is_mythical")
     private boolean isMythical;
@@ -93,13 +93,13 @@ public final class PokemonSpecies {
     private int hatchCounter;
 
     /**
-     * Whether or not this Pokémon has visual gender differences.
+     * Whether this Pokémon has visual gender differences.
      */
     @JsonProperty("has_gender_differences")
     private boolean hasGenderDifferences;
 
     /**
-     * Whether or not this Pokémon has multiple forms and can switch between them.
+     * Whether this Pokémon has multiple forms and can switch between them.
      */
     @JsonProperty("forms_switchable")
     private boolean formsSwitchable;

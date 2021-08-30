@@ -18,7 +18,7 @@ public final class TypeRelations {
     private List<NamedAPIResource<Type>> noDamageTo;
 
     /**
-     * A list of types this type is not very effect against.
+     * A list of types this type is not very effective against.
      */
     @FetchAs(Type.class)
     @JsonProperty("half_damage_to")

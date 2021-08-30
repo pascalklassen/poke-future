@@ -243,7 +243,7 @@ public final class PokemonService {
         Preconditions.checkNotNull(clazz);
         Preconditions.checkNotNull(uri);
         if(caches.containsKey(clazz)){
-             return (T) caches.get(clazz).getIfPresent(uri);
+            return (T) caches.get(clazz).getIfPresent(uri);
         }
         return null;
     }

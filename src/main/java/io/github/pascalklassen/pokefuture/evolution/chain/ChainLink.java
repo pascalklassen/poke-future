@@ -10,7 +10,7 @@ import java.util.List;
 public final class ChainLink {
 
     /**
-     * Whether or not this link is for a baby Pokémon. This would only ever be true on the base link.
+     * Whether this link is for a baby Pokémon. This would only ever be true on the base link.
      */
     @JsonProperty("is_baby")
     private boolean isBaby;

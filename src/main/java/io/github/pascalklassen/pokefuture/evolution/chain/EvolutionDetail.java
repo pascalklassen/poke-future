@@ -88,7 +88,7 @@ public final class EvolutionDetail {
     private int minAffection;
 
     /**
-     * Whether or not it must be raining in the overworld to cause evolution this Pokémon species.
+     * Whether it must be raining in the overworld to cause evolution this Pokémon species.
      */
     @JsonProperty("needs_overworld_rain")
     private boolean needsOverworldRain;
@@ -130,7 +130,7 @@ public final class EvolutionDetail {
     private NamedAPIResource<PokemonSpecies> tradeSpecies;
 
     /**
-     * Whether or not the 3DS needs to be turned upside-down as this Pokémon levels up.
+     * Whether the 3DS needs to be turned upside-down as this Pokémon levels up.
      */
     @JsonProperty("turn_upside_down")
     private boolean turnUpsideDown;
