@@ -32,7 +32,7 @@ public final class Language {
     private String name;
 
     /**
-     * Whether or not the games are published in this language.
+     * Whether the games are published in this language.
      */
     @JsonProperty("official")
     private boolean official;

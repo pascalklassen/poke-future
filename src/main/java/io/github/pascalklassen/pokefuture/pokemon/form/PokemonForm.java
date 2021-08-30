@@ -60,13 +60,13 @@ public final class PokemonForm {
     private boolean isDefault;
 
     /**
-     * Whether or not this form can only happen during battle.
+     * Whether this form can only happen during battle.
      */
     @JsonProperty("is_battle_only")
     private boolean isBattleOnly;
 
     /**
-     * Whether or not this form requires mega evolution.
+     * Whether this form requires mega evolution.
      */
     @JsonProperty("is_mega")
     private boolean isMega;

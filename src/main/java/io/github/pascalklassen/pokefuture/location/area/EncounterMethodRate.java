@@ -10,7 +10,7 @@ import java.util.List;
 public final class EncounterMethodRate {
 
     /**
-     * The method in which Pokémon may be encountered in an area..
+     * The method in which Pokémon may be encountered in an area.
      */
     @FetchAs(EncounterMethod.class)
     @JsonProperty("encounter_method")

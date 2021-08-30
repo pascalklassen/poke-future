@@ -18,8 +18,8 @@ import java.util.List;
 
 /**
  * A Pokédex is a handheld electronic encyclopedia device; one which is capable of recording and retaining information
- * of the various Pokémon in a given region with the exception of the national dex and some smaller dexes related to
- * portions of a region. See <a href="http://bulbapedia.bulbagarden.net/wiki/Pokedex">Bulbapedia</a> for greater detail.
+ * of the various Pokémon in a given region except the national dex and some smaller dexes related to portion of a
+ * region. See <a href="http://bulbapedia.bulbagarden.net/wiki/Pokedex">Bulbapedia</a> for greater detail.
  *
  * GET https://pokeapi.co/api/v2/pokedex/{id or name}/
  */
@@ -39,7 +39,7 @@ public final class Pokedex {
     private String name;
 
     /**
-     * Whether or not this Pokédex originated in the main series of the video games.
+     * Whether this Pokédex originated in the main series of the video games.
      */
     @JsonProperty("is_main_series")
     private boolean isMainSeries;

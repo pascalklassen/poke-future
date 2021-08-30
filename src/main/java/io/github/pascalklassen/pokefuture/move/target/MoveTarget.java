@@ -42,7 +42,7 @@ public final class MoveTarget {
     private List<Description> descriptions;
 
     /**
-     * A list of moves that that are directed at this target.
+     * A list of moves that are directed at this target.
      */
     @FetchAs(Move.class)
     @JsonProperty("moves")

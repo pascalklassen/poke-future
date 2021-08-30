@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Conditions which affect what pokemon might appear in the wild, e.g., day or night.
+ * Conditions which affect what Pokémon might appear in the wild, e.g., day or night.
  *
  * GET https://pokeapi.co/api/v2/encounter-condition/{id or name}/
  */

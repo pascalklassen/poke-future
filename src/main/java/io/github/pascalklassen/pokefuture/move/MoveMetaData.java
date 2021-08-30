@@ -29,7 +29,7 @@ public final class MoveMetaData {
     private int minHits;
 
     /**
-     * he maximum number of times this move hits. Null if it always only hits once.
+     * The maximum number of times this move hits. Null if it always only hits once.
      */
     @JsonProperty("max_hits")
     private int maxHits;
@@ -53,7 +53,7 @@ public final class MoveMetaData {
     private int drain;
 
     /**
-     * The amount of hp gained by the attacking Pokemon, in percent of it's maximum HP.
+     * The amount of hp gained by the attacking Pokémon, in percent of it's maximum HP.
      */
     @JsonProperty("healing")
     private int healing;

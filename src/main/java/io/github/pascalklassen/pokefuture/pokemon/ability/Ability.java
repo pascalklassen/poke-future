@@ -38,7 +38,7 @@ public final class Ability {
     private String name;
 
     /**
-     * Whether or not this ability originated in the main series of the video games.
+     * Whether this ability originated in the main series of the video games.
      */
     @JsonProperty("is_main_series")
     private boolean isMainSeries;

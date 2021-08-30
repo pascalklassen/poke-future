@@ -24,12 +24,10 @@ Replace `VERSION` in the examples below with the latest stable release version.
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <repositories>
-        <repositories>
-            <repository>
-                <id>ossrh</id>
-                <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-            </repository>
-        </repositories>
+        <repository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -98,7 +96,7 @@ class Example {
         Pokemon
                 .fetchList()
                 // Future<NamedAPIResourceList<Pokemon>>
-                .compose(resourceList -> APIResource.composeAll(resourceList.getResults()))
+                .compose(APIResource::composeAll)
                 // Future<List<Pokemon>>
                 .onSuccess(pokemonList -> 
                         pokemonList.forEach(pokemon -> System.out.println(pokemon.getName())))

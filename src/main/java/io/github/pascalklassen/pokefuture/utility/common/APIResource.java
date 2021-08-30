@@ -2,6 +2,8 @@ package io.github.pascalklassen.pokefuture.utility.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pascalklassen.pokefuture.PokemonService;
+import io.github.pascalklassen.pokefuture.utility.internal.APIResourceList;
+import io.github.pascalklassen.pokefuture.utility.internal.NamedAPIResourceList;
 import io.github.pascalklassen.pokefuture.utility.internal.TypeClassHolder;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -61,5 +63,13 @@ public class APIResource<ResourceT> extends TypeClassHolder<ResourceT> {
                 .onFailure(promise::fail);
 
         return promise.future();
+    }
+
+    public static <R, T extends APIResource<R>> Future<List<R>> composeAll(NamedAPIResourceList<R> list) {
+        return composeAll(list.getResults());
+    }
+
+    public static <R, T extends APIResource<R>> Future<List<R>> composeAll(APIResourceList<R> list) {
+        return composeAll(list.getResults());
     }
 }

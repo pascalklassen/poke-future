@@ -10,7 +10,7 @@ import io.github.pascalklassen.pokefuture.utility.internal.annotation.FetchAs;
 public final class PokemonAbility {
 
     /**
-     * Whether or not this is a hidden ability.
+     * Whether this is a hidden ability.
      */
     @JsonProperty("is_hidden")
     private boolean isHidden;

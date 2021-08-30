@@ -42,7 +42,7 @@ public class EvolutionTrigger {
     private List<Name> names;
 
     /**
-     * A list of pokemon species that result from this evolution trigger.
+     * A list of Pokémon species that result from this evolution trigger.
      */
     @FetchAs(PokemonSpecies.class)
     @JsonProperty("pokemon_species")
