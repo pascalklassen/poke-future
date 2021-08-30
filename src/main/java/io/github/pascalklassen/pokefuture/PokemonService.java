@@ -62,6 +62,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.codec.BodyCodec;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,22 +74,16 @@ import java.util.concurrent.TimeUnit;
 
 public final class PokemonService {
 
-    private static Map<Class<?>, Cache<String, Object>> caches;
-    private static boolean cachingEnabled = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(PokemonService.class);
 
+    private static boolean cachingEnabled = true;
+    private static Map<Class<?>, Cache<String, Object>> caches;
+
     static {
-        initailizeCaches();
+        initializeCaches();
     }
 
     private PokemonService() {
-    }
-
-    private static Cache<String, Object> createCache() {
-        return CacheBuilder
-                .newBuilder()
-                .expireAfterAccess(10, TimeUnit.MINUTES)
-                .build();
     }
 
     public static <T> Future<T> fetchAs(@NotNull Class<T> clazz, @NotNull String uri) {
@@ -96,6 +91,9 @@ public final class PokemonService {
     }
 
     public static <T> Future<T> fetchAs(@NotNull Class<T> clazz, @NotNull String uri, boolean absolute) {
+        Preconditions.checkNotNull(clazz);
+        Preconditions.checkNotNull(uri);
+
         Promise<T> promise = Promise.promise();
 
         if (cachingEnabled) {
@@ -116,6 +114,8 @@ public final class PokemonService {
                         resolveFetchTypes(clazz, t);
                         promise.complete(t);
                         if (cachingEnabled) {
+                            LOGGER.debug(String.format("Cached Value: '%s' -> '%s'", uri, clazz.getSimpleName()));
+
                             setValue(clazz, uri, t);
                         }
                     } else {
@@ -133,6 +133,7 @@ public final class PokemonService {
     public static <T> Future<APIResourceList<T>> fetchResourceList(@NotNull Class<T> clazz, @NotNull String uri, boolean absolute) {
         Preconditions.checkNotNull(clazz);
         Preconditions.checkNotNull(uri);
+
         Promise<APIResourceList<T>> promise = Promise.promise();
 
         HttpRequest<Buffer> request = absolute ?
@@ -163,6 +164,7 @@ public final class PokemonService {
     public static <T> Future<NamedAPIResourceList<T>> fetchNamedResourceList(@NotNull Class<T> clazz, @NotNull String uri, boolean absolute) {
         Preconditions.checkNotNull(clazz);
         Preconditions.checkNotNull(uri);
+
         Promise<NamedAPIResourceList<T>> promise = Promise.promise();
 
         HttpRequest<Buffer> request = absolute ?
@@ -185,26 +187,49 @@ public final class PokemonService {
         return promise.future();
     }
 
+    @SuppressWarnings("unchecked")
+    private static <T> T getValue(@NotNull Class<T> clazz, @NotNull String uri) {
+        Preconditions.checkNotNull(clazz);
+        Preconditions.checkNotNull(uri);
+
+        if (!caches.containsKey(clazz)) {
+            return null;
+        }
+
+        return (T) caches
+                .get(clazz)
+                .getIfPresent(uri);
+    }
+
+    private static <T> void setValue(@NotNull Class<T> clazz, @NotNull String key, @NotNull Object value) {
+        Preconditions.checkNotNull(clazz);
+        Preconditions.checkNotNull(key);
+        Preconditions.checkNotNull(value);
+
+        caches
+                .get(clazz)
+                .put(key, value);
+    }
+
+    public static void enableCaching() {
+        cachingEnabled = true;
+        initializeCaches();
+    }
+
     public static void disableCaching() {
         cachingEnabled = false;
         invalidateAllCaches();
         caches = null;
     }
 
-    public static void enableCaching() {
-        cachingEnabled = true;
-        initailizeCaches();
+    private static Cache<String, Object> createCache() {
+        return CacheBuilder
+                .newBuilder()
+                .expireAfterAccess(10, TimeUnit.MINUTES)
+                .build();
     }
 
-    private static void invalidateAllCaches() {
-        if (caches != null) {
-            for (Cache<String, Object> cache : caches.values()) {
-                invalidateCache(cache);
-            }
-        }
-    }
-
-    private static void initailizeCaches() {
+    private static void initializeCaches() {
         caches = new HashMap<>();
         caches.put(Ability.class, createCache());
         caches.put(Berry.class, createCache());
@@ -255,69 +280,62 @@ public final class PokemonService {
         caches.put(VersionGroup.class, createCache());
     }
 
+    private static void invalidateAllCaches() {
+        if (caches != null) {
+            for (Cache<String, Object> cache : caches.values()) {
+                invalidateCache(cache);
+            }
+        }
+    }
+
     private static void invalidateCache(@NotNull Cache<String, Object> cache) {
         Preconditions.checkNotNull(cache);
+
         cache.invalidateAll();
         cache.cleanUp();
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T getValue(@NotNull Class<T> clazz, @NotNull String uri) {
-        Preconditions.checkNotNull(clazz);
-        Preconditions.checkNotNull(uri);
-        if (!caches.containsKey(clazz)) {
-            return null;
-        }
-        return (T) caches
-                .get(clazz)
-                .getIfPresent(uri);
-    }
-
-    private static <T> void setValue(@NotNull Class<T> clazz, @NotNull String key, @NotNull Object value) {
-        Preconditions.checkNotNull(clazz);
-        Preconditions.checkNotNull(key);
-        Preconditions.checkNotNull(value);
-        caches
-                .get(clazz)
-                .put(key, value);
     }
 
     /**
      * If you can see this. I am crazy. I need medical help. Please contact me.
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void resolveFetchTypes(Class<?> clazz, Object t) {
-        if (!clazz.isAnnotationPresent(ResourceEntity.class)) return;
-        if (t == null) return;
+    private static void resolveFetchTypes(@NotNull Class<?> clazz, @Nullable Object object) {
+        Preconditions.checkNotNull(clazz);
 
-        //LOGGER.info(String.format("Resolving Fetch Types for Class '%s'", clazz.getSimpleName()));
+        if (!clazz.isAnnotationPresent(ResourceEntity.class)) return;
+        if (object == null) return;
+
+        LOGGER.debug(String.format("Resolving Fetch Types for Class '%s'", clazz.getSimpleName()));
 
         for (Field field : clazz.getDeclaredFields()) {
             if (field.getType().isPrimitive()) continue;
             field.setAccessible(true);
 
-            //LOGGER.info(String.format("Inspecting Field '%s'", field.getName()));
+            LOGGER.debug(String.format("%s:\tInspecting Field '%s'", clazz.getSimpleName(), field.getName()));
 
             try {
-                if (field.get(t) == null) continue;
+                Object value = field.get(object);
 
-                if (t instanceof NamedAPIResourceList) {
-                    //LOGGER.info("Class was NamedAPIResourceList");
-                    NamedAPIResourceList resourceList = (NamedAPIResourceList) t;
+                if (value == null) continue;
 
-                    if (field.get(t) instanceof List) {
-                        List<NamedAPIResource> list = (List<NamedAPIResource>) field.get(t);
+                if (object instanceof NamedAPIResourceList) {
+                    LOGGER.debug("Class was NamedAPIResourceList");
+
+                    NamedAPIResourceList resourceList = (NamedAPIResourceList) object;
+
+                    if (value instanceof List) {
+                        List<NamedAPIResource> list = (List<NamedAPIResource>) value;
                         list.forEach(obj -> {
                             obj.setTypeClass(resourceList.getTypeClass());
                             resolveFetchTypes(NamedAPIResource.class, obj);
                         });
                     }
                     continue;
-                } else if (t instanceof APIResourceList) {
-                    APIResourceList resourceList = (APIResourceList) t;
+                } else if (object instanceof APIResourceList) {
+                    APIResourceList resourceList = (APIResourceList) object;
 
-                    if (field.get(t) instanceof List) {
-                        List<APIResourceList> list = (List<APIResourceList>) field.get(t);
+                    if (value instanceof List) {
+                        List<APIResourceList> list = (List<APIResourceList>) value;
                         list.forEach(obj -> {
                             obj.setTypeClass(resourceList.getTypeClass());
                             resolveFetchTypes(APIResourceList.class, obj);
@@ -327,40 +345,42 @@ public final class PokemonService {
                 }
 
                 if (field.isAnnotationPresent(FetchAs.class)) {
-                    //LOGGER.info(String.format("Annotation was present on Field '%s'", field.getName()));
-                    FetchAs fetchAs = field.getAnnotation(FetchAs.class);
-                    Object o = field.get(t);
+                    LOGGER.debug(String.format("Annotation was present on Field '%s'", field.getName()));
 
-                    if (o instanceof List) {
-                        //LOGGER.info(String.format("Field '%s' was type List<TypeClassHolder>", field.getName()));
-                        List<TypeClassHolder> resources = (List<TypeClassHolder>) o;
+                    FetchAs fetchAs = field.getAnnotation(FetchAs.class);
+
+                    if (value instanceof List) {
+                        LOGGER.debug(String.format("Field '%s' was type List<TypeClassHolder>", field.getName()));
+
+                        List<TypeClassHolder> resources = (List<TypeClassHolder>) value;
                         resources.forEach(resource -> resource.setTypeClass(fetchAs.value()));
-                    } else if (o instanceof TypeClassHolder) {
-                        //LOGGER.info(String.format("Field '%s' was type TypeClassHolder", field.getName()));
-                        TypeClassHolder resource = (TypeClassHolder) o;
+                    } else if (value instanceof TypeClassHolder) {
+                        LOGGER.debug(String.format("Field '%s' was type TypeClassHolder", field.getName()));
+                        TypeClassHolder resource = (TypeClassHolder) value;
                         resource.setTypeClass(fetchAs.value());
                     } else {
                         LOGGER.error(
                                 String.format(
-                                        "Field '%s' in Class '%s' was neither a List nor a TypeClassHolder.",
+                                        "Field '%s' in Class '%s' was neither a List nor a TypeClassHolder",
                                         field.getName(),
                                         clazz.getName()
                                 )
                         );
                     }
                 } else {
-                    if (field.get(t) instanceof List) {
-                        //LOGGER.info(String.format("Field '%s' was a generic List", field.getName()));
-                        List<Object> list = (List<Object>) field.get(t);
+                    if (value instanceof List) {
+                        LOGGER.debug(String.format("Field '%s' was a generic List", field.getName()));
+
+                        List<Object> list = (List<Object>) field.get(object);
                         list.forEach(obj -> resolveFetchTypes(obj.getClass(), obj));
                     } else {
-                        //LOGGER.info(String.format("Field '%s' was a generic Object", field.getName()));
-                        Object obj = field.get(t);
-                        resolveFetchTypes(obj.getClass(), obj);
+                        LOGGER.debug(String.format("Field '%s' was a generic Object", field.getName()));
+
+                        resolveFetchTypes(value.getClass(), value);
                     }
                 }
             } catch (IllegalAccessException e) {
-                LOGGER.error(e.getMessage());
+                LOGGER.error(e.getMessage(), e);
             }
         }
     }
