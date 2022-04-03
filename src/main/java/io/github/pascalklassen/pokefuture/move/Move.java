@@ -1,6 +1,5 @@
 package io.github.pascalklassen.pokefuture.move;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import io.github.pascalklassen.pokefuture.PokemonService;
@@ -10,6 +9,7 @@ import io.github.pascalklassen.pokefuture.contest.type.ContestType;
 import io.github.pascalklassen.pokefuture.game.generation.Generation;
 import io.github.pascalklassen.pokefuture.move.damageclass.MoveDamageClass;
 import io.github.pascalklassen.pokefuture.move.target.MoveTarget;
+import io.github.pascalklassen.pokefuture.pokemon.Pokemon;
 import io.github.pascalklassen.pokefuture.pokemon.ability.AbilityEffectChange;
 import io.github.pascalklassen.pokefuture.pokemon.type.Type;
 import io.github.pascalklassen.pokefuture.utility.common.*;
@@ -28,8 +28,6 @@ import java.util.List;
  *
  * GET https://pokeapi.co/api/v2/move/{id or name}/
  */
-// TODO: Move["learned_by_pokemon"] NOT DOCUMENTED ON https://pokeapi.co/docs/v2#moves
-@JsonIgnoreProperties("learned_by_pokemon")
 @ResourceEntity
 public final class Move {
 
@@ -114,6 +112,13 @@ public final class Move {
      */
     @JsonProperty("effect_changes")
     private List<AbilityEffectChange> effectChanges;
+
+    /**
+     * List of Pokemon that can learn the move
+     */
+    @FetchAs(Pokemon.class)
+    @JsonProperty("learned_by_pokemon")
+    private List<NamedAPIResource<Pokemon>> learnedByPokemon;
 
     /**
      * The flavor text of this move listed in different languages.
@@ -286,6 +291,14 @@ public final class Move {
         this.effectChanges = effectChanges;
     }
 
+    public List<NamedAPIResource<Pokemon>> getLearnedByPokemon() {
+        return learnedByPokemon;
+    }
+
+    public void setLearnedByPokemon(List<NamedAPIResource<Pokemon>> learnedByPokemon) {
+        this.learnedByPokemon = learnedByPokemon;
+    }
+
     public List<MoveFlavorText> getFlavorTextEntries() {
         return flavorTextEntries;
     }
@@ -382,6 +395,7 @@ public final class Move {
                 ", damageClass=" + damageClass +
                 ", effectEntries=" + effectEntries +
                 ", effectChanges=" + effectChanges +
+                ", learnedByPokemon=" + learnedByPokemon +
                 ", flavorTextEntries=" + flavorTextEntries +
                 ", generation=" + generation +
                 ", machines=" + machines +

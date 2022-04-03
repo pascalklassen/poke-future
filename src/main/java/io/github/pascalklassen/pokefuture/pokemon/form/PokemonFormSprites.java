@@ -3,6 +3,7 @@ package io.github.pascalklassen.pokefuture.pokemon.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pascalklassen.pokefuture.utility.internal.annotation.ResourceEntity;
 
+//TODO: PokemonFormSprites["front_shiny_female", "front_female", "back_female", "back_shiny_female"] NOT DOCUMENTED ON https://pokeapi.co/docs/v2#pokemon
 @ResourceEntity
 public final class PokemonFormSprites {
 

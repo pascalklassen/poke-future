@@ -1,10 +1,10 @@
 package io.github.pascalklassen.pokefuture.pokemon.form;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pascalklassen.pokefuture.PokemonService;
 import io.github.pascalklassen.pokefuture.game.versiongroup.VersionGroup;
 import io.github.pascalklassen.pokefuture.pokemon.Pokemon;
+import io.github.pascalklassen.pokefuture.pokemon.PokemonFormType;
 import io.github.pascalklassen.pokefuture.utility.common.Name;
 import io.github.pascalklassen.pokefuture.utility.common.NamedAPIResource;
 import io.github.pascalklassen.pokefuture.utility.internal.NamedAPIResourceList;
@@ -23,9 +23,7 @@ import java.util.List;
  *
  * GET https://pokeapi.co/api/v2/pokemon-form/{id or name}/
  */
-// TODO: PokemonForm["types"] NOT DOCUMENTED ON https://pokeapi.co/docs/v2#pokemon-forms
 @ResourceEntity
-@JsonIgnoreProperties("types")
 public final class PokemonForm {
 
     /**
@@ -83,6 +81,12 @@ public final class PokemonForm {
     @FetchAs(Pokemon.class)
     @JsonProperty("pokemon")
     private NamedAPIResource<Pokemon> pokemon;
+
+    /**
+     * The name of this form.
+     */
+    @JsonProperty("types")
+    private List<PokemonFormType> types;
 
     /**
      * A set of sprites used to depict this Pokémon form in the game.
@@ -188,6 +192,14 @@ public final class PokemonForm {
         return sprites;
     }
 
+    public void setTypes(List<PokemonFormType> types) {
+        this.types = types;
+    }
+
+    public List<PokemonFormType> getTypes() {
+        return types;
+    }
+
     public void setSprites(PokemonFormSprites sprites) {
         this.sprites = sprites;
     }
@@ -228,6 +240,7 @@ public final class PokemonForm {
                 ", isMega=" + isMega +
                 ", formName='" + formName + '\'' +
                 ", pokemon=" + pokemon +
+                ", types=" + types +
                 ", sprites=" + sprites +
                 ", versionGroup=" + versionGroup +
                 ", names=" + names +

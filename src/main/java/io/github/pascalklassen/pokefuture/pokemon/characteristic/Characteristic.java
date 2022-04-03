@@ -19,7 +19,7 @@ import java.util.List;
  *
  * GET https://pokeapi.co/api/v2/characteristic/{id}/
  */
-// TODO: Characteristic["highest_stat"] NOT DOCUMENTED ON https://pokeapi.co/docs/v2#characteristics
+// TODO: Characteristic["highest_stat","descriptions"] NOT DOCUMENTED ON https://pokeapi.co/docs/v2#characteristics
 @JsonIgnoreProperties("highest_stat")
 @ResourceEntity
 public final class Characteristic {

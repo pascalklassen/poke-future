@@ -1,53 +1,50 @@
 package io.github.pascalklassen.pokefuture.utility.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.github.pascalklassen.pokefuture.utility.internal.annotation.ResourceEntity;
-import io.github.pascalklassen.pokefuture.game.versiongroup.VersionGroup;
-import io.github.pascalklassen.pokefuture.machine.Machine;
+import io.github.pascalklassen.pokefuture.game.generation.Generation;
 import io.github.pascalklassen.pokefuture.utility.internal.annotation.FetchAs;
+import io.github.pascalklassen.pokefuture.utility.internal.annotation.ResourceEntity;
 
 @ResourceEntity
-@JsonIgnoreProperties({"game_index", "generation"})
 public final class GenerationGameIndex {
 
     /**
-     * The machine that teaches a move from an item.
+     * The internal id of an API resource within game data.
      */
-    @FetchAs(Machine.class)
-    @JsonProperty("machine")
-    private APIResource<Machine> machine;
+    @JsonProperty("game_index")
+    private int gameIndex;
 
     /**
-     * The version group of this specific machine.
+     * The generation relevent to this game index.
      */
-    @FetchAs(VersionGroup.class)
-    private NamedAPIResource<VersionGroup> versionGroup;
+    @FetchAs(Generation.class)
+    @JsonProperty("generation")
+    private NamedAPIResource<Generation> generation;
 
     public GenerationGameIndex() {
     }
 
-    public APIResource<Machine> getMachine() {
-        return machine;
+    public int getGameIndex() {
+        return gameIndex;
     }
 
-    public void setMachine(APIResource<Machine> machine) {
-        this.machine = machine;
+    public void setGameIndex(int gameIndex) {
+        this.gameIndex = gameIndex;
     }
 
-    public NamedAPIResource<VersionGroup> getVersionGroup() {
-        return versionGroup;
+    public NamedAPIResource<Generation> getGeneration() {
+        return generation;
     }
 
-    public void setVersionGroup(NamedAPIResource<VersionGroup> versionGroup) {
-        this.versionGroup = versionGroup;
+    public void setGeneration(NamedAPIResource<Generation> generation) {
+        this.generation = generation;
     }
 
     @Override
     public String toString() {
         return "GenerationGameIndex{" +
-                "machine=" + machine +
-                ", versionGroup=" + versionGroup +
+                "gameIndex=" + gameIndex +
+                ", generation=" + generation +
                 '}';
     }
 }
