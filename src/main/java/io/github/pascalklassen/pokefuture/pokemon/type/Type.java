@@ -46,6 +46,12 @@ public final class Type {
     private TypeRelations damageRelations;
 
     /**
+     * A list of details of how effective this type was toward others and vice versa in previous generations.
+     */
+    @JsonProperty("past_damage_class")
+    private List<TypeRelationsPast> pastDamageClass;
+
+    /**
      * A list of game indices relevent to this item by generation.
      */
     @JsonProperty("game_indices")

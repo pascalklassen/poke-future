@@ -24,7 +24,6 @@ import java.util.List;
  *
  * GET https://pokeapi.co/api/v2/pokemon/{id or name}/
  */
-// TODO: Pokemon["past_types"] NOT DOCUMENTED ON https://pokeapi.co/docs/v2#pokemon
 @ResourceEntity
 @JsonIgnoreProperties("past_types")
 public final class Pokemon {
@@ -107,6 +106,12 @@ public final class Pokemon {
      */
     @JsonProperty("moves")
     private List<PokemonMove> moves;
+
+    /**
+     * A list of details showing types this pokémon had in previous generations.
+     */
+    @JsonProperty("past_types")
+    private List<PokemonTypePast> pastTypes;
 
     /**
      * A set of sprites used to depict this Pokémon in the game. A visual representation of the various sprites can be
@@ -241,6 +246,14 @@ public final class Pokemon {
         this.moves = moves;
     }
 
+    public List<PokemonTypePast> getPastTypes() {
+        return pastTypes;
+    }
+
+    public void setPastTypes(List<PokemonTypePast> pastTypes) {
+        this.pastTypes = pastTypes;
+    }
+
     public PokemonSprites getSprites() {
         return sprites;
     }
@@ -289,6 +302,7 @@ public final class Pokemon {
                 ", heldItems=" + heldItems +
                 ", locationAreaEncounters='" + locationAreaEncounters + '\'' +
                 ", moves=" + moves +
+                ", pastTypes=" + pastTypes +
                 ", sprites=" + sprites +
                 ", species=" + species +
                 ", stats=" + stats +
